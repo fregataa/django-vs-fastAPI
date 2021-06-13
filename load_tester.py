@@ -4,12 +4,12 @@ import json
 import requests
 
 
-def get_ones(session, model: str, iter: int):
-    print("\nStart get objects one by one\n==============================\n")
+def get_ones(url: str, session, model: str, iter: int):
+    print("\n==============================\nStart get objects one by one\n")
     avg = 0
     for i in range(iter):
         start_time = time.time()
-        response = session.get(f"http://127.0.0.1:9009/testapp/{model}/")
+        response = session.get(f"{url}{model}/")
         if response.status_code != 200:
             return
         latency = time.time() - start_time
@@ -21,17 +21,18 @@ def get_ones(session, model: str, iter: int):
     return avg
 
 
-def get_all(session, model: str):
-    print("\n==============================\nStart get all objects\nn")
+def get_all(url: str, session, model: str):
+    print("\n==============================\nStart get all objects\n")
     start_time = time.time()
-    response = session.get(f"http://127.0.0.1:9009/testapp/{model}/")
+    response = session.get(f"{url}{model}/")
     latency = time.time() - start_time
+    print("Object counts : " + response.text)
     print("Latency : " + str(latency) + " ms")
 
     return latency
 
 
-def create_many(session, model: str, headers: dict, iter: int):
+def create_many(url: str, session, model: str, headers: dict, iter: int):
     print("\n==============================\nStart create many objects\n")
     avg = 0
     for i in range(iter):
@@ -42,11 +43,11 @@ def create_many(session, model: str, headers: dict, iter: int):
         }
         start_time = time.time()
         response = session.post(
-            f"http://127.0.0.1:9009/testapp/{model}/",
+            f"{url}{model}/",
             headers=headers,
             data=json.dumps(data),
         )
-        if response.status_code != 201:
+        if response.status_code not in (200, 201):
             return
         latency = time.time() - start_time
         avg += latency
@@ -57,12 +58,10 @@ def create_many(session, model: str, headers: dict, iter: int):
     return avg
 
 
-def delete_all(session, model: str, headers: dict):
+def delete_all(url: str, session, model: str, headers: dict):
     print("\n==============================\nStart delete all objects\n")
     start_time = time.time()
-    response = session.delete(
-        f"http://127.0.0.1:9009/testapp/{model}/", headers=headers
-    )
+    response = session.delete(f"{url}{model}/", headers=headers)
     latency = time.time() - start_time
     print("Latency : " + str(latency) + " ms")
 
@@ -72,21 +71,22 @@ def delete_all(session, model: str, headers: dict):
 if __name__ == "__main__":
     TEST_ENV = os.environ["TEST_ENV"]
     if TEST_ENV == "sync":
+        url = "http://127.0.0.1:8000/"
         model = "books"
     elif TEST_ENV == "async":
+        url = "http://127.0.0.1:9009/"
         model = "async-books"
     else:
         print("Wrong ENV !!")
         exit()
 
-    iter = 1
-
+    iter = int(os.environ["ITER"])
     session = requests.Session()
 
-    response = session.get("http://127.0.0.1:9009/admin")
+    response = session.get(url + "admin")
     csrf_token = response.headers["Set-Cookie"][10:74]
-    print(csrf_token)
 
+    url += "testapp/"
     headers = {
         "Content-Type": "application/json",
         "X-CSRFToken": csrf_token,
@@ -94,19 +94,19 @@ if __name__ == "__main__":
 
     all_time = time.time()
     function_start = all_time
-    c_avg = create_many(session, model, headers, iter)
+    c_avg = create_many(url, session, model, headers, iter)
     print("create_many takes : " + str(time.time() - function_start) + " ms")
 
     function_start = time.time()
-    g_avg = get_ones(session, model, iter)
+    g_avg = get_ones(url, session, model, iter)
     print("get one takes : " + str(time.time() - function_start) + " ms")
 
     function_start = time.time()
-    g_lat = get_all(session, model)
+    g_lat = get_all(url, session, model)
     print("get all takes : " + str(time.time() - function_start) + " ms")
 
     function_start = time.time()
-    d_lat = delete_all(session, model, headers)
+    d_lat = delete_all(url, session, model, headers)
     print("delete all takes : " + str(time.time() - function_start) + " ms")
 
     print("\n-----------------------------")
