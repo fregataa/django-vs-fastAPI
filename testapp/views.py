@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from asgiref.sync import sync_to_async
 
-from django_app.models import Book, AsyncBook
+from testapp.models import Book, AsyncBook
 
 
 def index(request):
