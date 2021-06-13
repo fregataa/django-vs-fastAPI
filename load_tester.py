@@ -32,7 +32,7 @@ def get_all(session, model: str):
 
 
 def create_many(session, model: str, headers: dict, iter: int):
-    print("\n==============================\nStart create many objects\n\n")
+    print("\n==============================\nStart create many objects\n")
     avg = 0
     for i in range(iter):
         data = {
@@ -58,7 +58,7 @@ def create_many(session, model: str, headers: dict, iter: int):
 
 
 def delete_all(session, model: str, headers: dict):
-    print("\n==============================\nStart delete all objects\n\n")
+    print("\n==============================\nStart delete all objects\n")
     start_time = time.time()
     response = session.delete(
         f"http://127.0.0.1:9009/testapp/{model}/", headers=headers
