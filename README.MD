@@ -1,12 +1,12 @@
 # Django Async & ASGI Test
 
-## How to run Django default server
+## How to run Django default server with WSGI Gunicorn
 
 ```
 python manage.py runserver
 ```
 
-## How to run Uvicorn
+## How to run with Uvicorn
 
 Go to testproject dir where asgi.py module exists
 and run the command.

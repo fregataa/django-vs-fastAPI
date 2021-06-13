@@ -26,7 +26,6 @@ def get_all(url: str, session, model: str):
     start_time = time.time()
     response = session.get(f"{url}{model}/")
     latency = time.time() - start_time
-    print("Object counts : " + response.text)
     print("Latency : " + str(latency) + " ms")
 
     return latency
