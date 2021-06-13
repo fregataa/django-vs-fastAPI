@@ -71,15 +71,14 @@ def delete_all(url: str, session, model: str, headers: dict):
 if __name__ == "__main__":
     TEST_ENV = os.environ["TEST_ENV"]
     if TEST_ENV == "sync":
-        url = "http://127.0.0.1:8000/"
         model = "books"
     elif TEST_ENV == "async":
-        url = "http://127.0.0.1:9009/"
         model = "async-books"
     else:
         print("Wrong ENV !!")
         exit()
 
+    url = "http://127.0.0.1:8000/"
     iter = int(os.environ["ITER"])
     session = requests.Session()
 

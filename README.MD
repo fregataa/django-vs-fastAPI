@@ -3,7 +3,7 @@
 ## How to run Django default server
 
 ```
-python manage.py runserver 9009
+python manage.py runserver
 ```
 
 ## How to run Uvicorn
