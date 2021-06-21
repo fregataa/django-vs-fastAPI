@@ -68,27 +68,48 @@ def delete_all(url: str, session, model: str, headers: dict):
 
 
 if __name__ == "__main__":
-    TEST_ENV = os.environ["TEST_ENV"]
-    if TEST_ENV == "sync":
-        model = "books"
-    elif TEST_ENV == "async":
-        model = "async-books"
+    SUBJECT = os.environ["SUBJECT"]
+    try:
+        TEST_ENV = os.environ["TEST_ENV"]
+    except KeyError:
+        TEST_ENV = "sync"
+
+    model = "books"
+    django = ("django", "Django")
+    fastapi = ("fast", "fastAPI", "fastapi")
+
+    if SUBJECT in django:
+        port = 8000
+        if TEST_ENV == "async":
+            model = "async-books"
+
+    elif SUBJECT in fastapi:
+        port = 5005
+
     else:
-        print("Wrong ENV !!")
+        print("Please input valid subject of this test !!")
+        print("1. Valid Django subject :", f"one of {django}")
+        print("2. Valid FastAPI subject :", f"one of {fastapi}")
         exit()
 
-    url = "http://127.0.0.1:8000/"
+    url = f"http://127.0.0.1:{port}/"
     iter = int(os.environ["ITER"])
+
     session = requests.Session()
 
-    response = session.get(url + "admin")
-    csrf_token = response.headers["Set-Cookie"][10:74]
+    if SUBJECT in django:
+        response = session.get(url + "admin")
+        csrf_token = response.headers["Set-Cookie"][10:74]
 
-    url += "testapp/"
-    headers = {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrf_token,
-    }
+        url += "testapp/"
+        headers = {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf_token,
+        }
+    elif SUBJECT in fastapi:
+        headers = {
+            "Content-Type": "application/json",
+        }
 
     all_time = time.time()
     function_start = all_time
