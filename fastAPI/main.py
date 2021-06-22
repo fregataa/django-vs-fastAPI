@@ -27,13 +27,13 @@ async def read_root():
     return {"Hello": "World"}
 
 
-@app.get("/books/{book_id}/")
+@app.get("/books/{book_id}/", response_model=schemas.Book)
 async def get_book(book_id: int, db: AsyncSession = Depends(get_db)):
     result = await crud.get_book_by_id(db=db, id=book_id)
     return result
 
 
-@app.get("/books/")
+@app.get("/books/", response_model=List[schemas.Book])
 async def list_book(db: AsyncSession = Depends(get_db)):
     result = await crud.get_all_book(db=db)
     return result

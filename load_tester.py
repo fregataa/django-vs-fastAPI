@@ -97,19 +97,15 @@ if __name__ == "__main__":
 
     session = requests.Session()
 
+    headers = {
+        "Content-Type": "application/json",
+    }
     if SUBJECT in django:
         response = session.get(url + "admin")
         csrf_token = response.headers["Set-Cookie"][10:74]
 
         url += "testapp/"
-        headers = {
-            "Content-Type": "application/json",
-            "X-CSRFToken": csrf_token,
-        }
-    elif SUBJECT in fastapi:
-        headers = {
-            "Content-Type": "application/json",
-        }
+        headers["X-CSRFToken"] = csrf_token
 
     all_time = time.time()
     function_start = all_time
